@@ -1,9 +1,16 @@
-# Import Flask class from flask module
+"""
+A microservice that consumes data from external AP, transforms the data, and provides via new API endpoint.
+
+This is the core flask template to build on.
+"""
+
 from flask import Flask
+from routes import main
 
 # Create instance of Flask class
 # The __name__ variable used for setting up paths.
 app = Flask(__name__)
+app.register_blueprint(main)
 
 
 # Define a route for root URL -> tells Flask what URL triggers `home` function.
