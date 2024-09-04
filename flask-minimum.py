@@ -2,8 +2,9 @@
 from flask import Flask
 
 # Create instance of Flask class
-# The __name__ variable helps Flask to understand where the app is located (used for setting up paths).
+# The __name__ variable used for setting up paths.
 app = Flask(__name__)
+
 
 # Define a route for root URL -> tells Flask what URL triggers `home` function.
 @app.route('/')
@@ -11,6 +12,7 @@ def home():
     # `home` executed when upon access to root URL ('/')
     # Returns response message displayed in the browser
     return "TEMP TEXT"
+
 
 # Server starts only if script is executed directly, not as module.
 if __name__ == '__main__':
