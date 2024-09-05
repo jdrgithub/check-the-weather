@@ -18,12 +18,8 @@ def create_app():
     # SUPPRESSES WARNINGS
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # DB INIT WITH FLASK APP
-    db.init_app(app)
-
-    # CREATE TABLES BEFORE 1st REQUEST
-    @app.before_request
-    def create_tables():
+    # PUSH CONTEXT MANUALLY TO APP
+    with app.app_context():
         db.create_all()
 
     # IMPORT AND REGISTER BLUEPRINT FOR ROUTES
