@@ -1,2 +1,2 @@
 # check-the-weather
-Checking the weather using publicly available API.
+A Flask-baced app for pulling weather data using publicly available API.
