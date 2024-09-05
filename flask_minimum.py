@@ -18,6 +18,8 @@ def create_app():
     # SUPPRESSES WARNINGS
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    db.init_app(app)
+
     # PUSH CONTEXT MANUALLY TO APP
     with app.app_context():
         db.create_all()
