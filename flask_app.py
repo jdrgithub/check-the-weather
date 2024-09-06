@@ -6,6 +6,8 @@ THIS IS A STANDALONE FILE FOR NOW
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+import os
+import requests
 
 
 app_blueprint = Blueprint('app_blueprint', __name__)
@@ -91,6 +93,50 @@ def add_user():
         else:
             return render_template('add_user.html', error="Please provide username and email both.\n")
     return render_template('add_user.html')
+
+
+@app_blueprint.route('/weather/<city>')
+def get_weather(city):
+    api_key = os.getenv("OPENWEATHER_API_KEY")
+    # api_key = 'b1eecd366dee201541646eecd606f323'
+    city = 'London'
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+
+    response = requests.get(url)
+    print(response)
+    if response.status_code == 200:
+        weather_data = response.json()
+        print(weather_data)
+    else:
+        print(f"Failed to retrieve data: {response.status_code}")
+
+    data = response.json()
+    return jsonify(data), 200
+
+@app_blueprint.route('/weather-transformed/<city>')
+def get_weather_transformed(city):
+    api_key = os.getenv("OPENWEATHER_API_KEY")
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        return jsonify({"error": "Unable to fetch weather data"}), 500
+
+    data = response.json()
+
+    # Transform the data
+    transformed_data = {
+        "city": data["name"],
+        "temperature_celsius": data["main"]["temp"],
+        "temperature_fahrenheit": data["main"]["temp"] * 9/5 + 32,  # Convert to Fahrenheit
+        "humidity": data["main"]["humidity"],
+        "wind_speed": data["wind"]["speed"],
+        "description": data["weather"][0]["description"]
+    }
+
+    # return jsonify(transformed_data), 200
+    return jsonify(transformed_data), 200
+
 
 
 def create_app():
