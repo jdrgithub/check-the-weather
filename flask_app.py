@@ -11,6 +11,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 app_blueprint = Blueprint('app_blueprint', __name__)
 db = SQLAlchemy()
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -35,6 +36,7 @@ def about():
 def users():
     return "This is working!"
 
+
 # PUT USER_ID IN TO QUERY
 @app_blueprint.route("/get-user/<user_id>")
 def get_user(user_id):
@@ -51,19 +53,21 @@ def get_user(user_id):
 
     return jsonify(user_data), 200
 
+
 @app_blueprint.route("/create-user", methods=["POST"])
 def create_user():
     data = request.get_json()
-    # add to data base
+
     return jsonify(data), 201
 
 
 @app_blueprint.route('/list_users')
 def list_users():
-    users = User.query.all()  # Ensure this query works correctly
+    all_users = User.query.all()
     if not users:
         return "No users found."
-    return render_template('users.html', users=users)
+    return render_template('users.html', users=all_users)
+
 
 # ROUTE TO ADD A NEW USER VIA FORM SUBMISSION
 @app_blueprint.route('/add_user', methods=['POST', 'GET'])
@@ -88,6 +92,7 @@ def add_user():
             return render_template('add_user.html', error="Please provide username and email both.\n")
     return render_template('add_user.html')
 
+
 def create_app():
     flask_app = Flask(__name__)
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -102,6 +107,7 @@ def create_app():
     flask_app.register_blueprint(app_blueprint)
 
     return flask_app
+
 
 # Create/name the blueprint/Create blueprint object
 # Server starts only if script is executed directly, not as module.
