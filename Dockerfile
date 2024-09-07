@@ -1,6 +1,8 @@
 # Use Alpine as the base image
 FROM python:3.9-slim
 
+ARG OPENWEATHER_API_KEYBAS
+
 # Set environment variable to avoid interactive prompts during package installs
 ENV DEBIAN_FRONTEND=noninteractive
 
