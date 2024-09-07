@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 import os
 import requests
-
+from dash_weather import init_dashboard
 
 app_blueprint = Blueprint('app_blueprint', __name__)
 db = SQLAlchemy()
@@ -151,6 +151,9 @@ def create_app():
 
     # Import blueprints or routes
     flask_app.register_blueprint(app_blueprint)
+
+    # Initialize the Dash app and pass flask app's server
+    init_dashboard(flask_app)
 
     return flask_app
 
