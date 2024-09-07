@@ -7,6 +7,8 @@ import pandas as pd
 # Function to fetch weather data
 def fetch_weather_data(city, forecast_hours):
     api_key = os.getenv("OPENWEATHER_API_KEY")
+    if not api_key:
+        raise ValueError("API key not found.  Please set OPENWEATER_API_KEY environmental variable.")
     url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
 
     # MAKE API REQUEST TO OPENWEATHERMAP

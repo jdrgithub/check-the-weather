@@ -98,7 +98,8 @@ def add_user():
 @app_blueprint.route('/weather/<city>')
 def get_weather(city):
     api_key = os.getenv("OPENWEATHER_API_KEY")
-    # api_key = 'b1eecd366dee201541646eecd606f323'
+    if not api_key:
+        raise ValueError("API key not found.  Please set OPENWEATER_API_KEY environmental variable.")
     city = 'London'
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
@@ -116,6 +117,8 @@ def get_weather(city):
 @app_blueprint.route('/weather-transformed/<city>')
 def get_weather_transformed(city):
     api_key = os.getenv("OPENWEATHER_API_KEY")
+    if not api_key:
+        raise ValueError("API key not found.  Please set OPENWEATER_API_KEY environmental variable.")
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
     response = requests.get(url)
@@ -163,4 +166,4 @@ def create_app():
 if __name__ == '__main__':
     app = create_app()
     # STARTS FLASK AND ENABLES DEBUG MODE
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
