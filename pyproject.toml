@@ -22,8 +22,6 @@ typing-extensions = "4.12.2"
 certifi = "2024.8.30"
 charset-normalizer = "3.3.2"
 dash = "2.18.0"
-dash-core-components = "2.0.0"
-dash-html-components = "2.0.0"
 dash-table = "5.0.0"
 idna = "3.8"
 importlib-metadata = "8.4.0"
@@ -41,6 +39,7 @@ tenacity = "9.0.0"
 tzdata = "2024.1"
 urllib3 = "2.2.2"
 zipp = "3.20.1"
+python-dotenv = "1.0.1"
 
 
 [build-system]

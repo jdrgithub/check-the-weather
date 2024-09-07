@@ -1,7 +1,5 @@
 import os
-from dash import Dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
 import requests
 import pandas as pd
@@ -9,12 +7,39 @@ import pandas as pd
 # Function to fetch weather data
 def fetch_weather_data(city, forecast_hours):
     api_key = os.getenv("OPENWEATHER_API_KEY")
-    response = requests.get(f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric")
+    url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
+
+    # MAKE API REQUEST TO OPENWEATHERMAP
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f"Error fetching data: {response.status_code}")
+
     data = response.json()
-    df = pd.DataFrame(data['list'][:forecast_hours], columns=['dt_txt', 'main'])
-    df['time'] = pd.to_datetime(df['dt_txt'])
-    df['temperature'] = df['main'].apply(lambda x: x['temp'])
+
+    # EXTRACT TIME AND TEMP FROM FORECAST DATA
+    forecast_list = data['list'][:forecast_hours] # get forecast for specified hours
+    forecast_data = []
+
+    for forecast in forecast_list:
+        forecast_data.append({
+            'time': forecast['dt_txt'], # timestand of forecast
+            'temperature': forecast['main']['temp'], # temp in celsius
+            'humidity': forecast['main']['humidity'], # humidity percentage
+            'wind_speed': forecast['wind']['speed'], # windspeed in meters/sec
+            'description': forecast['weather'][0]['description'] # weather description
+        })
+
+    # CONVERT FORECAST DATA INTO A DATAFRAME
+    df = pd.DataFrame(forecast_data)
+    df['time'] = pd.to_datetime(df['time']) # convert the time
+
     return df
+
+   # A PREVIOUS OUTPUT
+    # df = pd.DataFrame(data['list'][:forecast_hours], columns=['dt_txt', 'main'])
+    # df['time'] = pd.to_datetime(df['dt_txt'])
+    # df['temperature'] = df['main'].apply(lambda x: x['temp'])
+
 def init_dashboard(server):
     dash_app = Dash(__name__, server=server, routes_pathname_prefix='/dashboard/')
 
@@ -58,7 +83,9 @@ def init_dashboard(server):
                 'name': selected_city,
             }],
             'layout': {
-                'title': 'Temperature Forecast'
+                'title': f'Temperature Forecast for {selected_city} (Next {forecast_hours} Hours)',
+                'xaxis': {'title': 'Time'},
+                'yaxis': {'title': 'Temperature (C)'},
             }
         }
 

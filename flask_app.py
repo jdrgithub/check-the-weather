@@ -10,7 +10,6 @@ import os
 import requests
 from dash_weather import init_dashboard
 
-
 app_blueprint = Blueprint('app_blueprint', __name__)
 db = SQLAlchemy()
 
