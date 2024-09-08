@@ -11,15 +11,19 @@ import requests
 from dash_weather import init_dashboard
 import logging
 import plotly.graph_objs as go
+from datetime import datetime
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
 
+current_datetime = datetime.now()
+formatted_date = current_datetime.strftime("Today is %a, %b %-d, %Y")
+
+weekday = current_datetime.strftime("%a")
 
 app_blueprint = Blueprint('app_blueprint', __name__)
 db = SQLAlchemy()
-
 
 
 @app_blueprint.route('/')
@@ -67,6 +71,12 @@ def get_weather(city):
             title="HUMIDITY",
             title_x=0.5,
             yaxis_title="PERCENTAGE (%)",
+            xaxis_title="Humidity",
+            xaxis_title_standoff=20,
+            xaxis=dict(
+                showticklabels=False,
+                title_font=dict(size=12)
+            )
         )
         graph_html1 = fig1.to_html(full_html=False, include_plotlyjs=False)
 
@@ -83,6 +93,12 @@ def get_weather(city):
             title="TEMPERATURE",
             title_x=0.5,
             yaxis_title="Degrees Celsius (°C)",
+            xaxis_title="Temperature",
+            xaxis_title_standoff=20,
+            xaxis=dict(
+                showticklabels=False,
+                title_font=dict(size=12)
+            )
         )
         graph_html2 = fig2.to_html(full_html=False, include_plotlyjs=False)
 
@@ -91,7 +107,7 @@ def get_weather(city):
         fig3.add_trace(go.Bar(
             x=["Wind Speed (m/s)"],
             y=[wind_speed],
-            name="WIND SPEED",
+            name="Wind Speed",
             marker=dict(color='#6082B6'),
             width=0.6
         ))
@@ -99,6 +115,12 @@ def get_weather(city):
             title='WIND SPEED',
             title_x=0.5,
             yaxis_title="Meters per second (m/s)",
+            xaxis_title="Wind Speed",
+            xaxis_title_standoff=20,
+            xaxis=dict(
+                showticklabels=False,
+                title_font=dict(size=12)
+            )
         )
         graph_html3 = fig3.to_html(full_html=False, include_plotlyjs=False)
 
@@ -139,7 +161,7 @@ def get_weather(city):
                 </style>
             </head>
             <body style="background-color:#132534;"> 
-                <h1 style="color:white;">Weather for {{ city }}</h1>
+                <h1 style="color:white;">Weather for {{ city }} for {{current_datetime}}</h1>
                 <div class="graph-container">
                     <div class="graph">
                         {{ graph_html1|safe }}
@@ -155,7 +177,7 @@ def get_weather(city):
         </html>
         '''
 
-        return render_template_string(html_template, city=city_name, graph_html1=graph_html1, graph_html2=graph_html2, graph_html3=graph_html3)
+        return render_template_string(html_template, city=city_name, current_datetime=current_datetime, graph_html1=graph_html1, graph_html2=graph_html2, graph_html3=graph_html3)
 
     except Exception as e:
         LOG.error(f"Error fetching weather data: {str(e)}")
