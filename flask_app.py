@@ -5,11 +5,12 @@ THIS IS A STANDALONE FILE FOR NOW
 """
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, render_template_string
 import os
 import requests
 from dash_weather import init_dashboard
 import logging
+import plotly.graph_objs as go
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -40,18 +41,125 @@ def get_weather(city):
 
     try:
         response = requests.get(url)
-        print(response)
-        if response.status_code == 200:
-            data = response.json()
-            return jsonify(data), 200
-        else:
-            print(f"Failed to retrieve data: {response.status_code}")
-    except requests.RequestException as e:
-        LOG.error(f"Request failed: {str(e)}")
-        return jsonify({"error": "Request to weather API failed"}), 500
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to retrieve weather data"}), response.status_code
 
-    data = response.json()
-    return jsonify(data), 200
+        data = response.json()
+
+        # Extract data for the graph
+        city_name = data["name"]
+        temperature = data["main"]["temp"]
+        humidity = data["main"]["humidity"]
+        wind_speed = data["wind"]["speed"]
+
+        # 1. HUMIDITY GRAPH
+        fig1 = go.Figure()
+
+        fig1.add_trace(go.Bar(
+            x=["Humidity"],
+            y=[humidity],
+            name="Humidity",
+            marker=dict(color=['#7393B3']),   # Custom color for cloud level
+            width=0.5
+        ))
+
+        fig1.update_layout(
+            title="HUMIDITY",
+            title_x=0.5,
+            yaxis_title="PERCENTAGE (%)",
+        )
+        graph_html1 = fig1.to_html(full_html=False, include_plotlyjs=False)
+
+        # 2. TEMPERATURE GRAPH
+        fig2 = go.Figure()
+        fig2.add_trace(go.Bar(
+            x=["Temperature (°C)"],
+            y=[temperature],
+            name="Temperature",
+            marker=dict(color='#7293cb'),
+            width=0.5
+        ))
+        fig2.update_layout(
+            title="TEMPERATURE",
+            title_x=0.5,
+            yaxis_title="Degrees Celsius (°C)",
+        )
+        graph_html2 = fig2.to_html(full_html=False, include_plotlyjs=False)
+
+        # 3. WIND SPEED GRAPH
+        fig3 = go.Figure()
+        fig3.add_trace(go.Bar(
+            x=["Wind Speed (m/s)"],
+            y=[wind_speed],
+            name="WIND SPEED",
+            marker=dict(color='#6082B6'),
+            width=0.6
+        ))
+        fig3.update_layout(
+            title='WIND SPEED',
+            title_x=0.5,
+            yaxis_title="Meters per second (m/s)",
+        )
+        graph_html3 = fig3.to_html(full_html=False, include_plotlyjs=False)
+
+
+        # Render HTML with Flexbox and limited width for each graph
+        html_template = '''
+        <html>
+            <head>
+                <title>Weather in {{ city }}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Include Plotly JS -->
+                <style>
+                    body {
+                        margin: 1 auto;  /* Center the content */
+                        max-width: 820px;  /* Limit the overall width of the page */
+                        padding: 40px;  /* Add padding for side margins */
+                        font-family: 'Roboto', sans-serif;  /* Apply Montserrat font */
+                    } 
+                    .graph-container {
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: space-between;
+                        background-color: #132534;
+                    }
+                    .graph {
+                        flex: 1 1 20%;  /* Control the flex width (30% of the container) */
+                        max-width: 240px;  /* Limit the maximum width of each graph */
+                        padding: 10px;
+                        margin: 10px;
+                        height: 450px; /# Adjust height to make the divs smaller */
+                        background-color: #708090
+                        border-radius: 10px;
+                    }
+                    h1 {
+                        text-align: center;
+                        font-size: 40;
+                        font-family: 'Roboto', sans-serif;  /* Apply Montserrat font */
+                </style>
+            </head>
+            <body style="background-color:#132534;"> 
+                <h1 style="color:white;">Weather for {{ city }}</h1>
+                <div class="graph-container">
+                    <div class="graph">
+                        {{ graph_html1|safe }}
+                    </div>
+                    <div class="graph">
+                        {{ graph_html2|safe }}
+                    </div>
+                    <div class="graph">
+                        {{ graph_html3|safe }}
+                    </div>
+                </div>
+            </body>
+        </html>
+        '''
+
+        return render_template_string(html_template, city=city_name, graph_html1=graph_html1, graph_html2=graph_html2, graph_html3=graph_html3)
+
+    except Exception as e:
+        LOG.error(f"Error fetching weather data: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), 500
 
 @app_blueprint.route('/weather-transformed/<city>')
 def get_weather_transformed(city):
