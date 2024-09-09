@@ -51,10 +51,10 @@ Once the app is up and running, you can access it at `http://localhost:5000`.
 To run the application in a Docker container, follow these steps:
 
 ### 1. Build the Docker Image:
-1. Make sure your `Dockerfile` is correctly configured with the `OPENWEATHER_API_KEY` argument.
-docker build --build-arg OPENWEATHER_API_KEY=your_api_key -t weather_dashboard .
+1. Make sure your `Dockerfile` is correctly configured with the `OPENWEATHER_API_KEY` argument:
+- docker build --build-arg OPENWEATHER_API_KEY=your_api_key -t weather_dashboard .
 2. Expose port 5000 and run the container:
-docker run -p 5000:5000 weather_dashboard
+- docker run -p 5000:5000 weather_dashboard
 The application will now be accessible at http://localhost:5000.
 
 
