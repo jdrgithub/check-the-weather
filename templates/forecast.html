@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecast</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Weather Dashboard</title>
+    <style>
+          body {
+              font-family: Arial, sans-serif;
+              background-color: #132534;
+              margin: 0;
+              padding: 0;
+              text-align: center;
+          }
+          header {
+              background-color: #132534;
+              color: white;
+              padding: 10px 0;
+              margin-bottom: 20px;
+          }
+          .container {
+              margin: 20px auto;
+              max-width: 600px;
+              background-color: white;
+              padding: 20px;
+              border-radius: 8px;
+              box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+          }
+          select, button {
+              padding: 10px;
+              margin-top: 20px;
+              border: 1px solid #3498db;
+              border-radius: 5px;
+              background-color: white;
+              color: #3498db;
+              font-size: 16px;
+              width: 200px;
+              margin-bottom: 20px;
+          }
+          button {
+              cursor: pointer;
+              background-color: #3498db;
+              color: white;
+              transition: background-color 0.3s;
+          }
+          button:hover {
+              background-color: #2980b9;
+          }
+          h1 {
+              color: white;
+          }
+          p {
+              color: #666;
+              font-size: 20px;
+          }
+      </style>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+    <p>{{ forecast }}</p>
+    <br>
+    <a href="/">Back to forecast selection</a>
+</body>
+</html>

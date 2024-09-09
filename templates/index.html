@@ -20,7 +20,7 @@
         }
         .container {
             margin: 20px auto;
-            max-width: 600px;
+            max-width: 625px;
             background-color: white;
             padding: 20px;
             border-radius: 8px;
@@ -48,7 +48,12 @@
         }
         p {
             color: #666;
-            font-size: 20px;
+            font-size: 26px;
+            margin: 0px;
+            font-family: 'Roboto', sans-serif;
+        }
+        button {
+            margin: 5;
         }
     </style>
 </head>
@@ -57,19 +62,35 @@
     <h1>Welcome to Your Weather Dashboard</h1>
 </header>
 <div class="container">
-    <p>Select a city to view the weather right now.</p>
+    <p>CURRENT WEATHER</p>
 
     <!-- Dropdown to select a city -->
-    <form method="POST" action="{{ url_for('app_blueprint.get_weather') }}">
+    <form method="POST" action="{{ url_for('app.get_weather') }}">
         <label for="city">Select a City:</label>
         <select name="city" id="city">
             <option value="New York" selected>New York</option>
             <option value="Los Angeles">Los Angeles</option>
             <option value="Chicago">Chicago</option>
         </select>
-        <br>
         <button type="submit">Get Weather</button>
     </form>
+    <p>WEATHER FORECAST</p>
+    <form action="/forecast" method="POST">
+        <label for="timeframe">Choose a time frame:</label>
+        <select name="timeframe" id="timeframe">
+            <option value="next_hour">Next Hour</option>
+            <option value="next_4_hours">Next 4 Hours</option>
+            <option value="next_day">Next Day</option>
+            <option value="next_3_days">Next 3 Days</option>
+        </select>
+        <button type="submit">Get Forecast</button>
+    </form>
+
+    <!-- Button to view Dash dashboard on /dashboard route -->
+    <p>FORECAST DASHBOARD</p>
+    <a href="/dashboard">
+        <button type="button">Go to Dash Dashboard</button>
+    </a>
 </div>
 </body>
 </html>
