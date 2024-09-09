@@ -60,7 +60,7 @@
     <p>Select a city to view the weather right now.</p>
 
     <!-- Dropdown to select a city -->
-    <form method="POST" action="{{ url_for('app_blueprint.get_weather') }}">
+    <form method="POST" action="{{ url_for('app.get_weather') }}">
         <label for="city">Select a City:</label>
         <select name="city" id="city">
             <option value="New York" selected>New York</option>

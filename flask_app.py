@@ -146,6 +146,11 @@ def get_weather():
         LOG.error(f"Error fetching weather data: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/hourly_forecast', methods=['POST'])
+def hourly_forecast():
+    city = request.form.get('city', 'New York')
+    print(city)
+
 
 # Get forecast data from OpenWeather API
 def get_openweather_forecast(timeframe, city='New York'):
