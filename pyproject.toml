@@ -42,6 +42,8 @@ zipp = "3.20.1"
 python-dotenv = "1.0.1"
 dash-core-components = "2.0.0"
 dash-html-components = "2.0.0"
+wheel = "^0.44.0"
+setuptools = "^74.1.2"
 
 
 [build-system]

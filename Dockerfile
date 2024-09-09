@@ -1,10 +1,17 @@
 # Use Alpine as the base image
 FROM python:3.9-slim
 
-ARG OPENWEATHER_API_KEYBAS
+ARG OPENWEATHER_API_KEY
+# Set the environment variable to pass the ARG value to the runtime environment
+# ARG is safer for sensitive values like API keys because they’re not stored in the final image
+ENV OPENWEATHER_API_KEY=$OPENWEATHER_API_KEY
 
 # Set environment variable to avoid interactive prompts during package installs
 ENV DEBIAN_FRONTEND=noninteractive
+
+# FLASK RUNS ON LOCALHOST:5000
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=5000
 
 # Install system tools (net-tools, procps, curl, iputils)
 RUN apt-get update && apt-get install -y --no-install-recommends \
