@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #132534;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #132534;
+            color: white;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        select, button {
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            background-color: white;
+            color: #3498db;
+            font-size: 16px;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        p {
+            color: #666;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Welcome to Your Weather Dashboard</h1>
+</header>
+<div class="container">
+    <p>Select a city to view the weather right now.</p>
+
+    <!-- Dropdown to select a city -->
+    <form method="POST" action="{{ url_for('app_blueprint.get_weather') }}">
+        <label for="city">Select a City:</label>
+        <select name="city" id="city">
+            <option value="New York" selected>New York</option>
+            <option value="Los Angeles">Los Angeles</option>
+            <option value="Chicago">Chicago</option>
+        </select>
+        <br>
+        <button type="submit">Get Weather</button>
+    </form>
+</div>
+</body>
+</html>

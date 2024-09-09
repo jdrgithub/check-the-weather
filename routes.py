@@ -82,10 +82,10 @@ def add_user():
                 return redirect(url_for('app_blueprint.list_users'))
             except Exception as e:
                 # Prevents BadRequestKeyError if no keys.
-                return render_template('add_user.html', error=str(e))  # Display errors
+                return render_template('index.html', error=str(e))  # Display errors
         else:
-            return render_template('add_user.html', error="Please provide username and email both.\n")
-    return render_template('add_user.html')
+            return render_template('index.html', error="Please provide username and email both.\n")
+    return render_template('index.html')
 
 def create_app():
     flask_app = Flask(__name__)
