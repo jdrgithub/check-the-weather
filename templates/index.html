@@ -70,6 +70,18 @@
         <br>
         <button type="submit">Get Weather</button>
     </form>
+    <p>Select Forecast Timeframe</p>
+    <form action="/forecast" method="POST">
+        <label for="timeframe">Choose a time frame:</label>
+        <select name="timeframe" id="timeframe">
+            <option value="next_hour">Next Hour</option>
+            <option value="next_4_hours">Next 4 Hours</option>
+            <option value="next_day">Next Day</option>
+            <option value="next_3_days">Next 3 Days</option>
+        </select>
+        <br>
+        <button type="submit">Get Weather</button>
+    </form>
 </div>
 </body>
 </html>

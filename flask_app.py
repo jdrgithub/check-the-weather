@@ -3,9 +3,8 @@ A microservice that consumes data from external AP, transforms the data, and pro
 
 THIS IS A STANDALONE FILE FOR NOW
 """
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Blueprint, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask import Blueprint, jsonify, render_template_string
 import os
 import requests
 from dash_weather import init_dashboard
@@ -13,32 +12,39 @@ import logging
 import plotly.graph_objs as go
 from datetime import datetime
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# GET KEY FROM ENV VAR
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
+BASE_URL = 'http://api.openweathermap.org/data/2.5/forecast'
+
+# SETUP LOGGING
 LOG = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
+# Datetime
 formatted_date = datetime.now().strftime("%a, %b %d, %Y at %I:%M%p")
-
 weekday = datetime.now().strftime("%a")
 
-app_blueprint = Blueprint('app_blueprint', __name__)
+# REGISTER BLUEPRINT
+app = Blueprint('app', __name__)
+# INSTANTIATE SQLALCHEMY
 db = SQLAlchemy()
 
 
-@app_blueprint.route('/')
+# JUMP PAGE
+@app.route('/')
 def index():
     return render_template('index.html')
 
 
-@app_blueprint.route('/about')
+@app.route('/about')
 def about():
     return 'This is the ABOUT page'
 
 
-@app_blueprint.route('/weather', methods=['GET', 'POST'])
+# GET WEATHER -> GETS CURRENT WEATHER
+@app.route('/weather', methods=['GET', 'POST'])
 def get_weather():
-    api_key = os.getenv("OPENWEATHER_API_KEY")
-    if not api_key:
+    if not API_KEY:
         raise ValueError("API key not found for /weather.  Please set OPENWEATHER_API_KEY environmental variable.")
 
     # DEFAULT TO NEW YORK
@@ -47,13 +53,12 @@ def get_weather():
     else:
         city = 'New York'  # Default when page loads first time
 
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
 
     try:
         response = requests.get(url)
         if response.status_code != 200:
             return jsonify({"error": "Failed to retrieve weather data"}), response.status_code
-
         data = response.json()
 
         # Extract data for the graph
@@ -64,7 +69,6 @@ def get_weather():
 
         # 1. HUMIDITY GRAPH
         fig1 = go.Figure()
-
         fig1.add_trace(go.Bar(
             x=["Humidity"],
             y=[humidity],
@@ -72,7 +76,6 @@ def get_weather():
             marker=dict(color=['#7393B3']),   # Custom color for cloud level
             width=0.5
         ))
-
         fig1.update_layout(
             title="HUMIDITY",
             title_x=0.5,
@@ -130,75 +133,68 @@ def get_weather():
         )
         graph_html3 = fig3.to_html(full_html=False, include_plotlyjs=False)
 
-
-        # Render HTML with Flexbox and limited width for each graph
-        html_template = '''
-        <html>
-            <head>
-                <title>Weather in {{ city }}</title>
-                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Include Plotly JS -->
-                <style>
-                    body {
-                        margin: 1 auto;  /* Center the content */
-                        max-width: 820px;  /* Limit the overall width of the page */
-                        padding: 40px;  /* Add padding for side margins */
-                        font-family: 'Roboto', sans-serif;  /* Apply Montserrat font */
-                    } 
-                    .graph-container {
-                        display: flex;
-                        flex-wrap: wrap;
-                        justify-content: space-between;
-                        background-color: #132534;
-                    }
-                    .graph {
-                        flex: 1 1 20%;  /* Control the flex width (30% of the container) */
-                        max-width: 240px;  /* Limit the maximum width of each graph */
-                        padding: 10px;
-                        margin: 10px;
-                        height: 450px; /* Adjust height to make the divs smaller */
-                        background-color: #708090
-                        border-radius: 10px;
-                    }
-                    h1 {
-                        text-align: center;
-                        font-size: 45;
-                        padding: 0;
-                        margin: 0;
-                        font-family: 'Roboto', sans-serif;  /* Apply Montserrat font */
-                    }
-                    h3 {
-                        text-align: center;
-                        padding: 0;
-                        margin: 0;
-                        font-size: 25;
-                        font-family: 'Roboto', sans-serif;  /* Apply Montserrat font */
-                    }
-                </style>
-            </head>
-            <body style="background-color:#132534;"> 
-                <h1 style="color:white;">{{ city }} Weather</h1>
-                <h3 style="color:grey;">{{current_datetime}}</h3>
-                <div class="graph-container">
-                    <div class="graph">
-                        {{ graph_html1|safe }}
-                    </div>
-                    <div class="graph">
-                        {{ graph_html2|safe }}
-                    </div>
-                    <div class="graph">
-                        {{ graph_html3|safe }}
-                    </div>
-                </div>
-            </body>
-        </html>
-        '''
-
-        return render_template_string(html_template, city=city_name, current_datetime=formatted_date, graph_html1=graph_html1, graph_html2=graph_html2, graph_html3=graph_html3)
+        return render_template(
+            'weather_today.html',
+            city=city_name,
+            current_datetime=formatted_date,
+            graph_html1=graph_html1,
+            graph_html2=graph_html2,
+            graph_html3=graph_html3
+        )
 
     except Exception as e:
         LOG.error(f"Error fetching weather data: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), 500
+
+
+# Get forecast data from OpenWeather API
+def get_openweather_forecast(timeframe, city='New York'):
+    # Request the weather data for the city
+    params = {
+        'q': city,
+        'appid': API_KEY,
+        'units': 'fahrenheit',  # Use 'imperial' for Fahrenheit
+    }
+    response = requests.get(BASE_URL, params=params)
+
+    # Parse the JSON data from OpenWeather
+    if response.status_code == 200:
+        weather_data = response.json()
+
+        if timeframe == 'next_hour':
+            # Get the forecast for the next hour
+            return weather_data['list'][0]['weather'][0]['description'], weather_data['list'][0]['main']['temp']
+
+        elif timeframe == 'next_4_hours':
+            # Get the forecast for the next 4 hours (OpenWeather provides 3-hour intervals)
+            return weather_data['list'][1]['weather'][0]['description'], weather_data['list'][1]['main']['temp']
+
+        elif timeframe == 'next_day':
+            # Get the forecast for the next 24 hours (approximately 8 intervals of 3 hours)
+            return weather_data['list'][8]['weather'][0]['description'], weather_data['list'][8]['main']['temp']
+
+        elif timeframe == 'next_3_days':
+            # Get the forecast for the next 3 days (approximately 24 intervals of 3 hours)
+            return weather_data['list'][24]['weather'][0]['description'], weather_data['list'][24]['main']['temp']
+    else:
+        return "Error fetching data from OpenWeather", None
+
+
+# Route to handle forecast requests
+@app.route('/forecast', methods=['POST'])
+def display_forecast():
+    selected_timeframe = request.form['timeframe']
+
+    # Fetch forecast from OpenWeather API based on the selected timeframe
+    forecast_description, forecast_temp = get_openweather_forecast(selected_timeframe)
+
+    if forecast_temp is not None:
+        forecast = f"{forecast_description.capitalize()} with a temperature of {forecast_temp}°C."
+    else:
+        forecast = forecast_description  # Error message in case of API failure
+
+    # Render the forecast page with the selected forecast
+    return render_template('forecast.html', forecast=forecast)
 
 
 def create_app():
@@ -212,7 +208,7 @@ def create_app():
         db.create_all()
 
     # Import blueprints or routes
-    flask_app.register_blueprint(app_blueprint)
+    flask_app.register_blueprint(app)
 
     # Initialize the Dash app and pass flask app's server
     init_dashboard(flask_app)
@@ -228,4 +224,4 @@ if __name__ == '__main__':
         # STARTS FLASK AND ENABLES DEBUG MODE
         app.run(host='0.0.0.0', port=5000, debug=True)
     except Exception as e:
-        LOG.error((f"Error starting application: {str(e)}"))
+        LOG.error(f"Error starting application: {str(e)}")
