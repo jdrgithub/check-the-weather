@@ -26,7 +26,7 @@ This project is a Flask-based microservice that consumes weather data from the O
 
 ### Install Dependencies
 1. Clone the repository:
-    git clone https://github.com/yourusername/weather_dashboard.git
+    git clone https://github.com/jdrgithub/check_the_weather.git
     cd weather_dashboard
 2. Install the required Python dependencies:
     pip install -r requirements.txt
