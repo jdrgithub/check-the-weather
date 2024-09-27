@@ -6,8 +6,8 @@ This project is a Flask-based microservice that consumes weather data from the O
 # Substack
 I'm writing blog posts about this API and data visualization test bed project.  
 
-- The Dashing Weather Dashboard - https://substack.com/@jonathanrooke/p-149481181
-- Digging Dash - https://substack.com/@jonathanrooke/p-149465357
+- The Dashing Weather Dashboard - https://tinyurl.com/bdyr4rec
+- Digging Dash - https://tinyurl.com/5yubva4f
 
 ### Features:
 - Real-time weather data for selected cities
