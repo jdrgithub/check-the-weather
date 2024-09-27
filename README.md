@@ -3,6 +3,12 @@
 ## Overview
 This project is a Flask-based microservice that consumes weather data from the OpenWeather API, processes the data, and provides it via new API endpoints. It also includes a dashboard built with Plotly and Dash to visualize the weather data, offering graphs for temperature, humidity, and wind speed.
 
+# Substack
+I'm writing blog posts about this API and data visualization test bed project.  
+
+- The Dashing Weather Dashboard - https://substack.com/@jonathanrooke/p-149481181
+- Digging Dash - https://substack.com/@jonathanrooke/p-149465357
+
 ### Features:
 - Real-time weather data for selected cities
 - Dynamic city selection via a dropdown menu
